@@ -27,7 +27,6 @@ class BookingsPage extends Component {
             bookings {
               _id
              createdAt
-             attendance
              event {
                _id
                date

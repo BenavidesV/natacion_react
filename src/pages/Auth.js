@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import { Form } from 'react-bootstrap';
 import './Auth.css';
 import AuthContext from '../context/auth-context';
 
@@ -28,7 +28,7 @@ class AuthPage extends Component {
   submitHandler = event => {
     event.preventDefault();
     const email = this.emailEl.current.value;
-    const password = this.passwordEl.current.value;    
+    const password = this.passwordEl.current.value;
 
 
     if (email.trim().length === 0 || password.trim().length === 0) {
@@ -109,47 +109,69 @@ class AuthPage extends Component {
     return (
       <form className="auth-form" onSubmit={this.submitHandler}>
         {this.state.isLogin ? (
-        <React.Fragment>
-          <div className="form-control">
-            <label htmlFor="email">E-Mail</label>
-            <input type="email" id="email" ref={this.emailEl} />
-          </div>
-          <div className="form-control">
-            <label htmlFor="password">Password</label>
-            <input type="password" id="password" ref={this.passwordEl} />
-          </div>
-        </React.Fragment>
-        ) : (
           <React.Fragment>
-            <div className="form-control">
-            <label htmlFor="email">E-Mail</label>
-            <input type="email" id="email" ref={this.emailEl} />
-          </div>
-            <div className="form-control">
-              <label htmlFor="password">Password</label>
-              <input type="password" id="password" ref={this.passwordEl} />
-            </div>
-            <div className="form-control">
-              <label htmlFor="fullname">Fullname</label>
-              <input type="text" id="fullname" ref={this.fullnameEl} />
-            </div>
-            <div className="form-control">
-              <label htmlFor="identification">ID</label>
-              <input type="number" id="identification" ref={this.identificationEl} />
-            </div>
-            <div className="form-control">
-              <label htmlFor="phone">Phone</label>
-              <input type="number" id="phone" ref={this.phoneEl} />
-            </div>
-            
+
+            <Form.Group>
+              <Form.Label>Email</Form.Label>
+              <Form.Control id="email" ref={this.emailEl} placeholder="Ingrese su email"
+                type="email" />
+              <Form.Text className="text-muted">
+                El email con el que se registró.
+                </Form.Text>
+            </Form.Group>
+
+            <Form.Group>
+              <Form.Label>Clave de acceso</Form.Label>
+              <Form.Control type="password" placeholder="Contraseña"
+                id="password" ref={this.passwordEl} />
+            </Form.Group>
+
+
+
           </React.Fragment>
-        )}
-        
+        ) : (
+            <React.Fragment>
+
+              <Form.Group>
+                <Form.Label>Email</Form.Label>
+                <Form.Control id="email" ref={this.emailEl} placeholder="Ingrese su email"
+                  type="email" />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Clave de acceso</Form.Label>
+                <Form.Control type="password" placeholder="Contraseña"
+                  id="password" ref={this.passwordEl} />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Nombre completo</Form.Label>
+                <Form.Control type="text" placeholder="Ingrese su nombre completo"
+                  id="fullname" ref={this.fullnameEl} />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label># Identificación</Form.Label>
+                <Form.Control type="number" placeholder="Ingrese su # de identificación"
+                  id="identification" ref={this.identificationEl} />
+              </Form.Group>
+
+              <Form.Group>
+                <Form.Label>Teléfono</Form.Label>
+                <Form.Control type="number" placeholder="Ingrese su # de teléfono"
+                  id="phone" ref={this.phoneEl} />
+              </Form.Group>
+
+
+
+            </React.Fragment>
+          )}
+
 
         <div className="form-actions">
-          <button type="submit">Submit</button>
+          <button type="submit">Enviar</button>
           <button type="button" onClick={this.switchModeHandler}>
-            Switch to {this.state.isLogin ? 'Signup' : 'Login'}
+            Dirigir a  {this.state.isLogin ? 'Registrarse' : 'Iniciar sesión'}
           </button>
         </div>
       </form>

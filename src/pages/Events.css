@@ -1,3 +1,22 @@
+.wrapper {
+  display: table;
+  height: 300px;
+    max-width: 760px;
+    min-height: 435px !important;
+    min-width: 400px;
+    margin-right:auto;
+    margin-left:auto;
+    margin-top:40px;
+}
+.cont-dragula {
+  display: table-cell;
+  background-color: rgba(255, 255, 255, 0.2);
+  width: 80%;
+}
+.cont-dragula:nth-child(odd) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
 .events-control {
   text-align: center;
   border: 1px solid #5101d1;
@@ -12,4 +31,117 @@
   background-color: #fff;
   align-items: center;
   justify-content: center;
+}
+
+.rectangle {
+  width: 2.5rem;
+  height: 1.0rem;
+  background-color:transparent;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-duration: 18s;
+  animation-name: spinner-loading;
+}
+.rectangle_2 {
+  width: 2.5rem;
+  height: 1.0rem;
+  background-color:transparent;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-duration: 18s;
+  animation-name: spinner-loading-2;
+}
+
+.swimming {
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-duration: 18s;
+  animation-name: spinner-rotate;
+}
+.swimming-2 {
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  animation-duration: 18s;
+  animation-name: spinner-rotate-2;
+}
+@keyframes spinner-loading {
+
+  0% {
+    transform: translate(0%,0%);
+    transition: 0.51s
+  }
+  
+  25% {
+    transform: translate(500%,0%);
+    
+    transition: 0.51s
+  }
+  50% {
+    transform: translate(500%,-200%);
+    transition: 0.51s;
+  }
+  75% {
+    transform: translate(0%,-200%);
+    transition: 0.51s
+  }
+  
+  to {
+    transform: translate(0%,0%);
+    transition: 10ms;
+  }
+}
+@keyframes spinner-loading-2 {
+
+  0% {
+    transform: translate(500%,-200%);
+    transition: 0.51s
+  }
+  
+  25% {
+    transform: translate(0%,-200%);
+    
+    transition: 0.51s
+  }
+  50% {
+    transform: translate(0%,0%);
+    transition: 0.51s;
+  }
+  75% {
+    transform: translate(500%,0%);
+    transition: 0.51s
+  }
+  
+  to {
+    transform: translate(500%,-200%);
+    transition: 10ms;
+  }
+}
+@keyframes spinner-rotate {
+  0% {
+    transform: rotate(0%,0%);
+  }
+  
+  52% {
+    transform: rotateY(180deg);
+    transition: 0.51s;
+  }
+  to {
+    transform: translate(0%,0%);
+    transition: 10ms;
+  }
+}
+@keyframes spinner-rotate-2 {
+  0% {
+    transform: rotateY(180deg);
+    transition: 0.51s;
+  }
+  
+  52% {
+    transform: rotate(0%,0%);
+    transition: 0.51s;
+  }
+  to {
+    transform: translate(0%,0%);
+    transition: 0.51s;
+  }
 }

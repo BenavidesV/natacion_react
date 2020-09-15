@@ -1,0 +1,10 @@
+.runway {
+    border-style: solid;
+    border-left-width: 0.1rem;
+    border-right-width: 0.1rem;
+    border-bottom-width: 0.01rem;
+    border-top-width: 0.01rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

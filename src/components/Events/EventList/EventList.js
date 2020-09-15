@@ -15,7 +15,6 @@ const eventList = props => {
         creatorId={event.creator._id}
         onDetail={props.onViewDetail}
         suscribers={props.suscribers}
-        runway={props.runway}
       />
       
     );
