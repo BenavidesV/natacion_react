@@ -171,7 +171,7 @@ class AuthPage extends Component {
         <div className="form-actions">
           <button type="submit">Enviar</button>
           <button type="button" onClick={this.switchModeHandler}>
-            Dirigir a  {this.state.isLogin ? 'Registrarse' : 'Iniciar sesión'}
+            {this.state.isLogin ? 'No tengo cuenta. Crear' : 'Tengo cuenta. Iniciar sesión'}
           </button>
         </div>
       </form>

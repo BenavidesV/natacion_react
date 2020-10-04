@@ -1,24 +1,28 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import WeekCalendar from 'react-week-calendar';
 import '../style.less';
 import moment from 'moment';
 
-import { Button, Modal, Container, Form, Col, Badge } from 'react-bootstrap';
+import { Container } from 'react-bootstrap';
 import Spinner from '../components/Spinner/Spinner';
 import AuthContext from '../context/auth-context';
 import './Events.css';
-//import './drag-util.js';
 import EventCell from '../components/Events/EventList/EventCell/EventCell';
 import Header from '../components/Header/Header';
+import Create from '../components/Events/Admin/Create';
+import AdminEvent from '../components/Events/Admin/AdminEvent';
+import UserEvent from '../components/Events/User/UserEvent';
+import GuestEvent from '../components/Events/Guest/GuestEvent';
 import Dragula from 'react-dragula';
 
 var dragula = require('react-dragula');
 class EventsPage extends Component {
-
+  
   state = {
     reiterative: false,
     creating: false,
     events: [],
+    bookings: [],
     isLoading: false,
     selectedEvent: null,
     show: false,
@@ -32,45 +36,23 @@ class EventsPage extends Component {
 
   static contextType = AuthContext;
 
-  constructor(props) {
-    super(props);
-    this.titleElRef = React.createRef();
-    this.dateHourElRef = React.createRef();
-    this.dateDayElRef = React.createRef();
-    this.dateMonthElRef = React.createRef();
-    this.descriptionElRef = React.createRef();
-    this.capacityElRef = React.createRef();
-  }
 
   componentDidMount() {
     this.fetchEvents();
-
-    var drake = dragula(Array.from(document.getElementsByClassName('cont-dragula')),
-      {
-        direction: 'horizontal',
-        revertOnSpill: true,
-      }
-    );
     
   }
   componentDidUpdate() {
-
-    dragula(Array.from(document.getElementsByClassName('cont-dragula')),
+    var drake = dragula(Array.from(document.getElementsByClassName('cont-dragula')),
       {
-        direction: 'horizontal',
-        revertOnSpill: true,
+        direction: 'horizontal'
       }
     );
-  }
-  registerControl = eventId => {
-    
-    this.setState(prevState => {
-      const selectedEvent = eventId;
-      //const selectedEvent = prevState.events.find(e => e._id === eventId);
-      return { selectedEvent: selectedEvent };
+    drake.on('drop', (el, target) => {
+      this.setRunway(el.id, Number.parseInt(target.id, 10));
     });
-  };
-  
+
+  }
+
   startCreateEventHandler = () => {
     this.setState({ creating: true, setShow: true });
   };
@@ -82,7 +64,7 @@ class EventsPage extends Component {
   handleChangeDay = (event) => {
     this.setState({ day: parseInt(event.target.value, 10) });
   }
-  handleClose = () => this.setState({ setShow: false });
+  handleClose = () => this.setState({ setShow: false, selectedEvent: null });
   handleShow = () => this.setState({ setShow: true });
   dragulaDecorator = (componentBackingInstance) => {
     if (componentBackingInstance) {
@@ -90,15 +72,12 @@ class EventsPage extends Component {
       Dragula([componentBackingInstance], options);
     }
   };
-  modalConfirmHandler = () => {
+
+  modalCancelHandler = () => {
+    this.setState({ setShow: false, show: false, creating: false, selectedEvent: null });
+  };
+  modalConfirmHandler = (title, description, capacity, dateMonth, dateYear, dateHour, dateDay) => {
     this.setState({ creating: false });
-    const title = this.titleElRef.current.value;
-    const description = this.descriptionElRef.current.value;
-    const capacity = parseInt(this.capacityElRef.current.value);
-    const dateMonth = moment(this.dateMonthElRef.current.value).format('MM');
-    const dateYear = moment(this.dateMonthElRef.current.value).format('YYYY');
-    const dateHour = this.dateHourElRef.current.value;
-    const dateDay = this.dateDayElRef.current.value;
     const todayDate = moment();
 
     if (
@@ -110,7 +89,6 @@ class EventsPage extends Component {
       return;
     }
     var dateC = moment((dateYear + "-" + dateMonth + "-" + 1 + "T" + dateHour), 'YYYY-MM-DD hh:mm');
-    const event = { title, dateC, description };
 
     const token = this.context.token;
 
@@ -127,8 +105,7 @@ class EventsPage extends Component {
     for (const day1 in arrDays) {
 
       var currentDate = moment((dateYear + "-" + dateMonth + "-" + (Number(day1) + 1) + "T" + dateHour), 'YYYY-MM-DD hh:mm');
-      //console.log("fecha actual: "+todayDate+"currentDate: "+currentDate);
-      if (currentDate.day() == dateDay && currentDate >= todayDate) {
+      if (currentDate.day() === dateDay && currentDate >= todayDate) {
 
         requestBody = {
           query: `
@@ -194,10 +171,6 @@ class EventsPage extends Component {
 
   };
 
-  modalCancelHandler = () => {
-    this.setState({ setShow: false, show: false, creating: false, selectedEvent: null });
-  };
-
   fetchEvents() {
     this.setState({ isLoading: true });
     const requestBody = {
@@ -258,11 +231,16 @@ class EventsPage extends Component {
 
   showDetailHandler = eventId => {
     this.setState({ setShow: true });
-    this.setState(prevState => {
+    if (this.context.token) {
+      this.getBookings(eventId._id);
+    }
+
+    this.setState(() => {
       const selectedEvent = eventId;
       //const selectedEvent = prevState.events.find(e => e._id === eventId);
       return { selectedEvent: selectedEvent };
     });
+
   };
 
   bookEventHandler = () => {
@@ -329,8 +307,11 @@ class EventsPage extends Component {
                       mutation BookEvent($id: ID!) {
                         bookEvent(eventId: $id) {
                           _id
-                         createdAt
-                         updatedAt
+                          user {
+                            _id
+                            email
+                            fullname
+                          }
                         }
                       }
                     `,
@@ -354,8 +335,16 @@ class EventsPage extends Component {
                   return res.json();
                 })
                 .then(resData => {
-                  console.log(resData);
-                  //this.setState({ selectedEvent: null });
+                  var newBooking = {
+                    _id: resData.data.bookEvent.user._id,
+                    email: resData.data.bookEvent.user.email,
+                    fullname: resData.data.bookEvent.user.fullname
+                  };
+                  if (!event.suscribers.filter(function (e) { return e._id === newBooking._id; }).length > 0) {
+                    event.suscribers.push(
+                      newBooking
+                    )
+                  }
                 })
                 .catch(err => {
                   console.log(err);
@@ -378,13 +367,20 @@ class EventsPage extends Component {
 
 
     } else {
+      const stateEvents = this.state.events;
       const requestBody = {
         query: `
             mutation BookEvent($id: ID!) {
               bookEvent(eventId: $id) {
                 _id
-               createdAt
-               updatedAt
+                user{
+                  _id
+                  email
+                  fullname
+                }
+                event{
+                  _id
+                }
               }
             }
           `,
@@ -408,8 +404,21 @@ class EventsPage extends Component {
           return res.json();
         })
         .then(resData => {
-          console.log(resData);
-          this.setState({ selectedEvent: null });
+
+          stateEvents.forEach(element => {
+            var newBooking = {
+              _id: resData.data.bookEvent.user._id,
+              email: resData.data.bookEvent.user.email,
+              fullname: resData.data.bookEvent.user.fullname
+            };
+            if (!element.suscribers.filter(function (e) { return e._id === newBooking._id; }).length > 0) {
+              element.suscribers.push(
+                newBooking
+              )
+            }
+          });
+
+          this.setState({ events: stateEvents, selectedEvent: null });
         })
         .catch(err => {
           console.log(err);
@@ -417,21 +426,61 @@ class EventsPage extends Component {
     }
 
   };
-  confirmBookingHandler(eventId){
-    console.log("Aqui debe ser");
+
+  setRunway(currentUserId, runwaySelected) {
+    
+    var currentBookings = [...this.state.bookings];
+    const list = currentBookings.map((element, i) => {
+
+      if (element.user._id === currentUserId) {
+        element.runway=runwaySelected;
+        element.attendance=true;
+        if (runwaySelected === 0) element.attendance=false;
+      }
+    });
+    /*if (this.isActive) {
+      this.setState(prevState => ({
+        bookings: {
+          ...prevState.bookings,
+          [prevState.bookings]: currentBookings,
+        },
+      }));
+      //this.setState({bookings: null});
+      //this.setState({bookings: currentBookings});  
+    }*/
+    
+    console.log("desde setRunway: "+JSON.stringify(this.state.bookings));
+    //this.handleUpdate(this.state.bookings);
+    //return currentBookings;
+    //this.checkList();
+
+  }
+  componentWillUnmount() {
+    this.isActive = false;
+    var drake = dragula(Array.from(document.getElementsByClassName('cont-dragula')));
+    drake.destroy();
+  }
+  getBookings(eventId) {
     this.setState({ isLoading: true });
     const requestBody = {
       query: `
-          mutation ConfirmBooking($id: ID!) {
-            confirmBooking(eventId: $id) {
+          mutation EventBookings($eventId: ID!) {
+            eventBookings(eventId: $eventId) {
             _id
+            attendance
+            runway
+            user{
+              _id
+              fullname
+            }
             }
           }
         `,
       variables: {
-        id: eventId
+        eventId: eventId
       }
     };
+
 
     fetch('http://localhost:8000/graphql', {
       method: 'POST',
@@ -448,18 +497,71 @@ class EventsPage extends Component {
         return res.json();
       })
       .then(resData => {
-        console.log("updated");
+        //var stateEvents = this.state.events;
+
+        this.setState({ bookings: resData.data.eventBookings, isLoading: false });
       })
       .catch(err => {
         console.log(err);
         this.setState({ isLoading: false });
       });
-  };
-  setRunway() {
-    console.log("Suelta el boton");
   }
-  componentWillUnmount() {
-    this.isActive = false;
+  checkList = () => {
+    //this.setState({ isLoading: true });
+    var stateBookings = this.state.bookings;
+    stateBookings.map(booking => {
+      if (booking.runway === null) {
+        booking.runway = 0;
+      }
+      const requestBody = {
+        query: `
+            mutation checkList($bookingId: ID!, $runwaySelected: Int) {
+              checkList(bookingId: $bookingId, runwaySelected: $runwaySelected) {
+              _id
+              attendance
+              runway
+              user{
+                _id
+              }
+              }
+            }
+          `,
+        variables: {
+          bookingId: booking._id,
+          runwaySelected: booking.runway
+        }
+
+      };
+      fetch('http://localhost:8000/graphql', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + this.context.token
+        }
+      })
+        .then(res => {
+          if (res.status !== 200 && res.status !== 201) {
+            throw new Error('Failed!');
+          }
+          return res.json();
+        })
+        .then(resData => {
+          console.log("pasa por aqui");
+          this.setState({ isLoading: false, selectedEvent: null, creating: false });
+          this.handleUpdate(stateBookings);
+          return ("Updated!");
+        })
+        .catch(err => {
+          console.log(err);
+          this.setState({ isLoading: false });
+          
+        });
+        return;
+    })};
+
+  handleUpdate = (updatedBookings) => {
+    this.setState({bookings: updatedBookings});
   }
 
   render() {
@@ -467,187 +569,45 @@ class EventsPage extends Component {
       <React.Fragment>
 
         {this.state.creating && (
-          <Modal
-            show={this.state.setShow}
-            onHide={this.handleClose}
-            backdrop="static"
+          <Create
+            setShow={this.state.setShow}
+            handleChangeDay={this.handleChangeDay}
+            handleClose={this.handleClose}
+            modalCancelHandler={this.modalCancelHandler}
+            modalConfirmHandler={this.modalConfirmHandler}
           >
-            <Modal.Header closeButton>
-              <Modal.Title>Crear evento</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <Form>
-                <Form.Group>
-                  <Form.Label>Nombre</Form.Label>
-                  <Form.Control
-                    id="title"
-                    ref={this.titleElRef}
-                    type="text"
-                  />
-                </Form.Group>
-
-                <Form.Row>
-                  <Col>
-                    <Form.Group
-                      controlId="weekday"
-                      onChange={this.handleChangeDay}
-                    >
-                      <Form.Label>Seleccione el día</Form.Label>
-                      <Form.Control as="select" ref={this.dateDayElRef}>
-                        <option value='1'>Lunes</option>
-                        <option value='2'>Martes</option>
-                        <option value='3'>Miércoles</option>
-                        <option value='4'>Jueves</option>
-                        <option value='5'>Viernes</option>
-                        <option value='6'>Sábado</option>
-                      </Form.Control>
-                    </Form.Group>
-                  </Col>
-                  <Col>
-                    <Form.Group
-                    >
-                      <Form.Label>Seleccione el mes</Form.Label>
-                      <Form.Control
-                        id="month"
-                        ref={this.dateMonthElRef}
-                        type="month"
-                      >
-                      </Form.Control>
-                    </Form.Group>
-                  </Col>
-                </Form.Row>
-
-                <Form.Group>
-                  <Form.Label>Seleccione la hora</Form.Label>
-                  <Form.Control
-                    type="time"
-                    id="dateHour"
-                    ref={this.dateHourElRef}>
-                  </Form.Control>
-                </Form.Group>
-                <Form.Row>
-                  <Col>
-                    <Form.Group>
-                      <Form.Label>Capacidad máxima</Form.Label>
-                      <Form.Control
-                        id="capacity"
-                        ref={this.capacityElRef}
-                        type="number"
-                        min='1'
-                      />
-                    </Form.Group>
-                  </Col>
-                </Form.Row>
-                <Form.Group>
-                  <Form.Label>Descripción</Form.Label>
-                  <Form.Control
-                    id="description"
-                    ref={this.descriptionElRef}
-                    as="textarea"
-
-                  />
-                </Form.Group>
-              </Form>
-
-            </Modal.Body>
-            <Modal.Footer>
-              <Button variant="secondary" onClick={this.modalCancelHandler}>
-                Cancelar
-          </Button>
-              <Button variant="primary" onClick={this.modalConfirmHandler}>
-                Guardar
-          </Button>
-            </Modal.Footer>
-          </Modal>
+          </Create>
         )}
-        {this.state.selectedEvent && (
-          <Modal
-            show={this.state.setShow}
-            onHide={this.handleClose}
-            backdrop="static"
-          >
-            <Modal.Header closeButton>
-              <Modal.Title>{this.state.selectedEvent.title + "  " +
-                moment(this.state.selectedEvent.date).format("DD/MM/YYYY") + " "
-                + new Date(this.state.selectedEvent.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-              <p>{this.state.selectedEvent.description}</p>
-              <p>Capacidad máxima: {this.state.selectedEvent.capacity} personas</p>
-              {this.state.selectedEvent.suscribers &&
-                this.state.selectedEvent.suscribers.length > 0 && (
-                  <div className="">
-                    <h6 className="text-center">Inscritos</h6>
-                    <div
-                      className="container-fluid justify-content-center cont-dragula"
-                      id="left1"
-                      ref={this.dragulaDecorator}
-                    >
-                      <span>Pueden volver aqui</span><Badge>2019</Badge><Badge>2020</Badge>
-                      {this.state.selectedEvent.suscribers.map(item =>
-                        <Badge key={item._id} variant="primary">
-                          {item.fullname}
-                        </Badge>
-                      )}
-                    </div>
-
-                    <div id="right1" className="container-fluid justify-content-center">
-                      <h6 className="text-center">Asistentes</h6>
-                      <div className="row">
-                        <div className="col-1">1</div>
-                        <div id='r1' className="cont-dragula row col-11" ref={this.dragulaDecorator}></div>
-                      </div>
-                      <div className="row">
-                        <div className="col-1">2</div>
-                        <div id='r2' className="cont-dragula row col-11" ref={this.dragulaDecorator}></div>
-                      </div>
-                      <div className="row">
-                        <div className="col-1">3</div>
-                        <div id='r3' className="cont-dragula row col-11" ref={this.dragulaDecorator}></div>
-                      </div>
-                      <div className="row">
-                        <div className="col-1">4</div>
-                        <div id='r4' className="cont-dragula row col-11" ref={this.dragulaDecorator}></div>
-                      </div>
-                      <div className="row">
-                        <div className="col-1">5</div>
-                        <div id='r5' className="cont-dragula row col-11" ref={this.dragulaDecorator}></div>
-                      </div>
-                      <div className="row">
-                        <div className="col-1">6</div>
-                        <div id='r6' className="cont-dragula row col-11" ref={this.dragulaDecorator}></div>
-                      </div>
-
-                    </div>
-                  </div>
-                )}
-              {this.state.selectedEvent.suscribers.length > 0 && this.context.token &&
-                this.state.selectedEvent.suscribers.map((susc) =>
-                  <Badge key={susc._id} variant="primary">
-                    {susc.fullname}
-                  </Badge>
-                )}
-
-            </Modal.Body>
-            <Modal.Footer>
-              {this.context.userRole !== "a" && this.context.token && (
-                <Form.Check type="checkbox" label="Evento concurrente" onChange={this.handleCheck} />
-              )}
-              <Button variant="secondary" onClick={this.modalCancelHandler}>
-                Volver
-              </Button>
-              {this.state.selectedEvent.suscribers && this.context.userRole !== "a" &&
-                this.state.selectedEvent.suscribers.length < this.state.selectedEvent.capacity && (
-                  <Button variant="primary" onClick={this.bookEventHandler}>
-                    {this.context.token ? 'Reservar' : 'Confirmar'}
-                  </Button>
-                )}
-              {this.context.userRole === "a" && (
-                <Button variant="primary" onClick={this.modalCancelHandler}>
-                  Volver
-                </Button>)}
-            </Modal.Footer>
-          </Modal>
+        {this.state.selectedEvent && this.context.token && this.context.userRole === "a" && (
+          <AdminEvent
+            setShow={this.state.setShow}
+            handleClose={this.handleClose}
+            modalCancelHandler={this.modalCancelHandler}
+            bookEventHandler={this.bookEventHandler}
+            selectedEvent={this.state.selectedEvent}
+            bookings={this.state.bookings}
+            checkList={this.checkList}
+            handleUpdate={this.handleUpdate}
+          ></AdminEvent>
+        )}
+        {this.state.selectedEvent && this.context.token && this.context.userRole !== "a" && (
+          <UserEvent
+            setShow={this.state.setShow}
+            handleClose={this.handleClose}
+            modalCancelHandler={this.modalCancelHandler}
+            bookEventHandler={this.bookEventHandler}
+            selectedEvent={this.state.selectedEvent}
+            today={moment().format()}
+          ></UserEvent>
+        )}
+        {this.state.selectedEvent && !this.context.token && (
+          <GuestEvent
+            setShow={this.state.setShow}
+            handleClose={this.handleClose}
+            modalCancelHandler={this.modalCancelHandler}
+            bookEventHandler={this.bookEventHandler}
+            selectedEvent={this.state.selectedEvent}
+          ></GuestEvent>
         )}
         {this.context.token && this.context.userRole === "a" && (
           <div className="events-control">
@@ -675,7 +635,7 @@ class EventsPage extends Component {
                 headerCellComponent={Header}
                 onEventClick={this.showDetailHandler}
                 useModal={false}
-                //dayFormat={('es-ES', "dd   DD/MM/YYYY")}
+              //dayFormat={('es-ES', "dd   DD/MM/YYYY")}
               /></Container>
           )}
 

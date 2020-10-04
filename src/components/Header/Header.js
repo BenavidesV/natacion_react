@@ -10,8 +10,7 @@ const propTypes = {
 class Header extends React.PureComponent {
   render() {
     const {
-      date,
-      dayFormat,
+      date
     } = this.props;
     return (<span className="title">{moment(date).locale('es').format('DD/MM/YYYY')}</span>);
   }
