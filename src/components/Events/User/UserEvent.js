@@ -1,20 +1,50 @@
 import React from 'react';
 import { Button, Modal, Form, Badge } from 'react-bootstrap';
 import moment from 'moment';
-class createEvent extends React.Component {
+import Swimmer from '../Admin/Swimmer'
+class UserEvent extends React.Component {
     _isMounted = false;
     constructor(props) {
         super(props);
-        this.handleClose = this.handleClose.bind(this);        
+        this.handleClose = this.handleClose.bind(this);
     }
-    
+
     handleClose() {
         this.props.handleClose();
     }
     handleChangeDay() {
         this.props.handleChangeDay();
     }
+    sortRunways() {
+        //const [c_bookings,setBookings] = useState({c_bookings: this.props.stateBookings});
+        const sBookings = this.props.bookings;
+        console.log("desde sort antes de ordenar: " + JSON.stringify(sBookings));
+        var r = [];
+        for (let index = 1; index <= 6; index++) {
+            r.push(
+                <div className="row" key={r + index}>
+                    <div className="col-1">{index}</div>
+
+                    <div id={index} className="row col-11" ref={this.dragulaDecorator}>
+                        {Array.isArray(sBookings) && sBookings.map(booking => {
+                            if (booking.runway === index) {
+                                return (<Swimmer key={booking.user._id} id={booking.user._id}
+                                    individualBooking={booking}
+                                ></Swimmer>);
+                            }
+                            return null;
+                        })}
+                    </div>
+                </div>
+            );
+
+        }
+        //console.log(JSON.stringify(r));
+        return r;
+    }
     render() {
+        var sBookings = (this.state) ? this.state.bookings : this.props.bookings;
+        console.log("desde render: " + JSON.stringify(sBookings));
         return <Modal
             show={this.props.setShow}
             onHide={this.props.handleClose}
@@ -27,50 +57,30 @@ class createEvent extends React.Component {
             </Modal.Header>
             <Modal.Body>
                 <p>{this.props.selectedEvent.description}</p>
-                <p>Cupos disponibles: {this.props.selectedEvent.capacity-this.props.selectedEvent.suscribers.length} personas</p>
+                <p>Cupos disponibles: {this.props.selectedEvent.capacity - this.props.selectedEvent.suscribers.length} personas</p>
                 {this.props.selectedEvent.suscribers &&
                     this.props.selectedEvent.suscribers.length > 0 && (
                         <div className="">
                             <h6 className="text-center">Inscritos ({this.props.selectedEvent.suscribers.length})</h6>
                             <div
-                                className="container-fluid justify-content-center "
+                                className="container-fluid justify-content-center cont-dragula"
                                 id='0'
-
                             >
-                                <span>Pueden volver aqui</span>
-                                {this.props.selectedEvent.suscribers.map(item =>
-                                    <Badge key={item._id} id={item._id} variant="primary">
-                                        {item.fullname}
-                                    </Badge>
+                                {sBookings && sBookings.map(item => {
+
+                                    if (item.runway === 0) {
+                                        return (<Swimmer key={item.user._id} id={item.user._id}
+                                            individualBooking={item}
+                                        ></Swimmer>);
+                                    }
+                                    return
+                                }
+
                                 )}
                             </div>
-
                             <div id="right1" className="container-fluid justify-content-center">
                                 <h6 className="text-center">Asistentes</h6>
-                                <div className="row">
-                                    <div className="col-1">1</div>
-                                    <div id='1' className="row col-11" ></div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-1">2</div>
-                                    <div id='2' className="row col-11" ></div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-1">3</div>
-                                    <div id='3' className="row col-11" ></div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-1">4</div>
-                                    <div id='4' className="row col-11" ></div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-1">5</div>
-                                    <div id='5' className="row col-11" ></div>
-                                </div>
-                                <div className="row">
-                                    <div className="col-1">6</div>
-                                    <div id='6' className="row col-11" ></div>
-                                </div>
+                                {this.sortRunways()}
 
                             </div>
                         </div>
@@ -96,4 +106,4 @@ class createEvent extends React.Component {
 
 
 
-export default createEvent;
+export default UserEvent;

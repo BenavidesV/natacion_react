@@ -3,7 +3,7 @@ import { Button, Modal, Badge } from 'react-bootstrap';
 import moment from 'moment';
 import Swimmer from './Swimmer';
 
-class createEvent extends React.Component {
+class AdminEvent extends React.Component {
 
     isActive = true;
     constructor(props) {
@@ -38,7 +38,6 @@ class createEvent extends React.Component {
     }
 
     sortRunways() {
-        //const [c_bookings,setBookings] = useState({c_bookings: this.props.stateBookings});
         const sBookings = this.props.bookings;
         console.log("desde sort antes de ordenar: " + JSON.stringify(sBookings));
         var r = [];
@@ -66,11 +65,8 @@ class createEvent extends React.Component {
     }
 
     render() {
-        //const s2Bookings = this.state.bookings;
-        //const sBookings = this.props.bookings;
-
         //console.log(JSON.stringify(sBookings));
-        var sBookings = (this.state) ? this.state.bookings : this.props.stateBookings;
+        var sBookings = (this.state) ? this.state.bookings : this.props.bookings;
         console.log("desde render: " + JSON.stringify(sBookings) );
         return <Modal
             show={this.props.setShow}
@@ -132,4 +128,4 @@ class createEvent extends React.Component {
 
 
 
-export default createEvent;
+export default AdminEvent;

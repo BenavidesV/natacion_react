@@ -597,6 +597,7 @@ class EventsPage extends Component {
             modalCancelHandler={this.modalCancelHandler}
             bookEventHandler={this.bookEventHandler}
             selectedEvent={this.state.selectedEvent}
+            bookings={this.state.bookings}
             today={moment().format()}
           ></UserEvent>
         )}

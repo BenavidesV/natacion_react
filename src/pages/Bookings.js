@@ -21,7 +21,7 @@ class BookingsPage extends Component {
 
   fetchBookings = () => {
     this.setState({ isLoading: true });
-    const requestBody = {
+    /*const requestBody = {
       query: `
           query {
             bookings {
@@ -31,6 +31,22 @@ class BookingsPage extends Component {
              event {
                _id
                date
+             }
+            }
+          }
+        `
+    };*/
+    const requestBody = {
+      query: `
+          query {
+            approvalBookings {
+              _id
+             event {
+               _id
+               date
+             }
+             user{
+               fullname
              }
             }
           }
@@ -52,7 +68,7 @@ class BookingsPage extends Component {
         return res.json();
       })
       .then(resData => {
-        const bookings = resData.data.bookings;
+        const bookings = resData.data.approvalBookings;
         this.setState({ bookings: bookings, isLoading: false });
       })
       .catch(err => {
@@ -104,7 +120,49 @@ class BookingsPage extends Component {
         this.setState({ isLoading: false });
       });
   };
+  confirmBookingHandler = bookingId => {
+    this.setState({ isLoading: true });
+    const requestBody = {
+      query: `
+          mutation ConfirmBooking($id: ID!) {
+            confirmBooking(bookingId: $id) {
+            _id
+             title
+            }
+          }
+        `,
+      variables: {
+        id: bookingId
+      }
+    };
 
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.context.token
+      }
+    })
+      .then(res => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then(resData => {
+        this.setState(prevState => {
+          const updatedBookings = prevState.bookings.filter(booking => {
+            return booking._id !== bookingId;
+          });
+          return { bookings: updatedBookings, isLoading: false };
+        });
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({ isLoading: false });
+      });
+  };
   changeOutputTypeHandler = outputType => {
     if (outputType === 'list') {
       this.setState({ outputType: 'list' });
@@ -127,6 +185,7 @@ class BookingsPage extends Component {
               <BookingList
                 bookings={this.state.bookings}
                 onDelete={this.deleteBookingHandler}
+                onConfirm={this.confirmBookingHandler}
               />
             ) : (
               <BookingsChart bookings={this.state.bookings} />
