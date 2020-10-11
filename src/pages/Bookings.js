@@ -10,13 +10,18 @@ class BookingsPage extends Component {
   state = {
     isLoading: false,
     bookings: [],
-    outputType: 'list'
+    outputType: 'list',
+    reiterative:false
   };
 
   static contextType = AuthContext;
 
   componentDidMount() {
     this.fetchBookings();
+  }
+  handleCheck = () => {
+    this.setState({ reiterative: !this.state.reiterative });
+    console.log("handleCheck: "+this.state.reiterative);
   }
 
   fetchBookings = () => {
@@ -41,12 +46,14 @@ class BookingsPage extends Component {
           query {
             approvalBookings {
               _id
+              approved
              event {
                _id
                date
              }
              user{
                fullname
+               _id
              }
             }
           }
@@ -69,6 +76,9 @@ class BookingsPage extends Component {
       })
       .then(resData => {
         const bookings = resData.data.approvalBookings;
+        bookings.forEach(b => {
+          b['reiterative'] = false; 
+        });
         this.setState({ bookings: bookings, isLoading: false });
       })
       .catch(err => {
@@ -127,7 +137,7 @@ class BookingsPage extends Component {
           mutation ConfirmBooking($id: ID!) {
             confirmBooking(bookingId: $id) {
             _id
-             title
+            approved
             }
           }
         `,
@@ -153,7 +163,7 @@ class BookingsPage extends Component {
       .then(resData => {
         this.setState(prevState => {
           const updatedBookings = prevState.bookings.filter(booking => {
-            return booking._id !== bookingId;
+            return booking._id !== bookingId;;
           });
           return { bookings: updatedBookings, isLoading: false };
         });

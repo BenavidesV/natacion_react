@@ -18,7 +18,6 @@ class UserEvent extends React.Component {
     sortRunways() {
         //const [c_bookings,setBookings] = useState({c_bookings: this.props.stateBookings});
         const sBookings = this.props.bookings;
-        console.log("desde sort antes de ordenar: " + JSON.stringify(sBookings));
         var r = [];
         for (let index = 1; index <= 6; index++) {
             r.push(

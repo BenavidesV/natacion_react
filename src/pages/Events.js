@@ -58,7 +58,7 @@ class EventsPage extends Component {
   };
   handleCheck = () => {
     this.setState({ reiterative: !this.state.reiterative });
-    console.log(this.state.reiterative);
+    console.log("handleCheck: "+this.state.reiterative);
   };
 
   handleChangeDay = (event) => {
@@ -105,7 +105,7 @@ class EventsPage extends Component {
     for (const day1 in arrDays) {
 
       var currentDate = moment((dateYear + "-" + dateMonth + "-" + (Number(day1) + 1) + "T" + dateHour), 'YYYY-MM-DD hh:mm');
-      if (currentDate.day() === dateDay && currentDate >= todayDate) {
+      if (currentDate.day() == dateDay && currentDate >= todayDate) {
 
         requestBody = {
           query: `
@@ -249,6 +249,7 @@ class EventsPage extends Component {
       this.setState({ selectedEvent: null });
       return;
     }
+    console.log("En bookEventHandler: "+this.state.reiterative);
     if (this.state.reiterative) {
 
       const requestBodyEvents = {
@@ -295,7 +296,11 @@ class EventsPage extends Component {
             event['start'] = moment(event.date);
             event['end'] = moment(event.date).add(1, 'hours');
             event['value'] = event.description;
-
+            console.log(moment(event.date) >= moment(this.state.selectedEvent.date)+
+            "day(): "+moment(event.date).day() === moment(this.state.selectedEvent.date).day()+
+            "month: "+moment(event.date).month() === moment(this.state.selectedEvent.date).month()+
+            "hour: "+moment(event.date).hour() === moment(this.state.selectedEvent.date).hour()+
+            "year: "+(moment(event.date).year() === moment(this.state.selectedEvent.date).year()));
             if (moment(event.date) >= moment(this.state.selectedEvent.date) &&
               (moment(event.date).day() === moment(this.state.selectedEvent.date).day()) &&
               (moment(event.date).month() === moment(this.state.selectedEvent.date).month()) &&
@@ -594,6 +599,7 @@ class EventsPage extends Component {
           <UserEvent
             setShow={this.state.setShow}
             handleClose={this.handleClose}
+            handleCheck={this.handleCheck}
             modalCancelHandler={this.modalCancelHandler}
             bookEventHandler={this.bookEventHandler}
             selectedEvent={this.state.selectedEvent}
