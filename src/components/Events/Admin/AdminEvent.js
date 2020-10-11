@@ -12,9 +12,9 @@ class AdminEvent extends React.Component {
 
     }
     componentDidMount() {
-        if (this.props.bookings) {
+        /*if (this.props.bookings) {
             this.setState({ bookings: this.props.bookings });
-        }
+        }*/
 
         //this.state.bookings = this.props.bookings;
     }

@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import Spinner from '../components/Spinner/Spinner';
 import AuthContext from '../context/auth-context';
 import BookingList from '../components/Bookings/BookingList/BookingList';
+import BookingListUser from '../components/Bookings/BookingListUser/BookingListUser';
 import BookingsChart from '../components/Bookings/BookingsChart/BookingsChart';
 import BookingsControls from '../components/Bookings/BookingsControls/BookingsControls';
 
@@ -17,7 +18,14 @@ class BookingsPage extends Component {
   static contextType = AuthContext;
 
   componentDidMount() {
-    this.fetchBookings();
+    if (this.context.token 
+      && this.context.userRole !== "a") {
+        this.fetchMyBookings();
+    }
+    if (this.context.token 
+      && this.context.userRole === "a") {
+        this.fetchBookings();
+    }
   }
   handleCheck = () => {
     this.setState({ reiterative: !this.state.reiterative });
@@ -80,6 +88,54 @@ class BookingsPage extends Component {
           b['reiterative'] = false; 
         });
         this.setState({ bookings: bookings, isLoading: false });
+      })
+      .catch(err => {
+        console.log(err);
+        this.setState({ isLoading: false });
+      });
+  };
+  fetchMyBookings = () => {
+    this.setState({ isLoading: true });
+    const requestBody = {
+      query: `
+          query {
+            bookings {
+              _id
+             createdAt
+             attendance
+             event {
+               _id
+               date
+             }
+             user{
+              fullname
+              _id
+            }
+            }
+          }
+        `
+    };
+
+    fetch('http://localhost:8000/graphql', {
+      method: 'POST',
+      body: JSON.stringify(requestBody),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + this.context.token
+      }
+    })
+      .then(res => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Failed!');
+        }
+        return res.json();
+      })
+      .then(resData => {
+        const bookings = resData.data.bookings;
+        this.setState({ bookings: bookings, isLoading: false });
+        //console.log("Se ejecuta MyBookings: "+bookings);
+        //return(bookings);
+        
       })
       .catch(err => {
         console.log(err);
@@ -184,6 +240,7 @@ class BookingsPage extends Component {
   render() {
     let content = <Spinner />;
     if (!this.state.isLoading) {
+
       content = (
         <React.Fragment>
           <BookingsControls
@@ -191,15 +248,22 @@ class BookingsPage extends Component {
             onChange={this.changeOutputTypeHandler}
           />
           <div>
-            {this.state.outputType === 'list' ? (
+            {this.state.outputType === 'list' && this.context.token 
+            && this.context.userRole === "a" &&
               <BookingList
                 bookings={this.state.bookings}
                 onDelete={this.deleteBookingHandler}
                 onConfirm={this.confirmBookingHandler}
               />
-            ) : (
-              <BookingsChart bookings={this.state.bookings} />
-            )}
+            }
+            {this.state.outputType === 'list' && this.context.token 
+            && this.context.userRole !== "a" &&
+              <BookingListUser
+                bookings={this.state.bookings}//this.fetchMyBookings
+                onDelete={this.deleteBookingHandler}
+              />
+            }
+            
           </div>
         </React.Fragment>
       );

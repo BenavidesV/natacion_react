@@ -58,7 +58,6 @@ class EventsPage extends Component {
   };
   handleCheck = () => {
     this.setState({ reiterative: !this.state.reiterative });
-    console.log("handleCheck: "+this.state.reiterative);
   };
 
   handleChangeDay = (event) => {
@@ -404,7 +403,9 @@ class EventsPage extends Component {
       })
         .then(res => {
           if (res.status !== 200 && res.status !== 201) {
+            alert("Usted ya estaba registrado");
             throw new Error('Failed!');
+            
           }
           return res.json();
         })

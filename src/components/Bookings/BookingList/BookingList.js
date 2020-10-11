@@ -13,26 +13,19 @@ class bookingList extends React.Component {
     switch (day) {
       case 1:
         return 'lunes'
-        break;
       case 2:
         return 'martes'
-        break;
       case 3:
         return 'miércoles'
-        break;
       case 4:
         return 'jueves'
-        break;
       case 5:
         return 'viernes'
-        break;
       case 6:
         return 'sábado'
-        break;
 
       default:
         return 'domingo'
-        break;
     }
 
   }
@@ -78,14 +71,14 @@ class bookingList extends React.Component {
             </div>
 
             <div className="bookings__item-actions">
-              <button className="btn" title="Rechazar"
+              <button className="btn-decline" title="Rechazar"
                 //onClick={this.onReiterative('cancel', moment(booking.event.date))}
                 onClick={this.props.onDelete.bind(this, booking._id)}>
                 <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z" />
                 </svg>
               </button>
-              <button className="btn" title={"Rechazar todos los " + this.weekDay(moment(booking.event.date).day()) + " del mes"}
+              <button className="btn-decline" title={"Rechazar todos los " + this.weekDay(moment(booking.event.date).day()) + " del mes"}
                 onClick={() => this.onReiterative('cancel', booking)}
               >
                 <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-x" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -98,13 +91,13 @@ class bookingList extends React.Component {
               </button>
             </div>
             <div className="bookings__item-actions">
-              <button title="Aprobar" className="btn"
+              <button title="Aprobar" className="btn-accept"
                 onClick={this.props.onConfirm.bind(this, booking._id)}>
                 <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z" />
                 </svg>
               </button>
-              <button className="btn" title={"Aprobar todos los " + this.weekDay(moment(booking.event.date).day()) + " del mes"}
+              <button className="btn-accept" title={"Aprobar todos los " + this.weekDay(moment(booking.event.date).day()) + " del mes"}
                 onClick={() => this.onReiterative('confirm', booking)}>
                 <svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-check" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
                   <path fillRule="evenodd" d="M10.97 4.97a.75.75 0 0 1 1.071 1.05l-3.992 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.236.236 0 0 1 .02-.022z" />

@@ -39,6 +39,14 @@ body {
   background: #6219d6;
   border-color: #6219d6;
 }
+.btn-accept:hover, .btn-accept:active {
+  background: #59be4c;
+  border-color: #59be4c;
+}
+.btn-decline:hover, .btn-decline:active {
+  background: #f02a10;
+  border-color: #f02a10;
+}
 .weekCalendar{
   position:relative;
   box-sizing:border-box;
