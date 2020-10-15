@@ -56,3 +56,7 @@
   color: #5101d1;
   border-radius: 5px;
 }
+.rounded-img {
+  border-radius: 50% !important;
+  border-color: white;
+}

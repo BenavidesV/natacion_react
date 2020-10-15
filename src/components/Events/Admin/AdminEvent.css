@@ -1,0 +1,29 @@
+.row-2, .row-3, .row-4, .row-5 {
+    border: 8px solid transparent;
+    padding: 12px;
+    border-image: url(separador.jpg) 30 round;
+    border-bottom: none;
+    border-right: solid;
+    border-left-style: solid;
+}
+.row-1{
+    border: 8px solid transparent;
+    padding: 12px;
+    border-image: url(separador.jpg) 30 round;
+    border-top: solid;
+    border-right: solid;
+    border-left-style: solid;
+    border-bottom: none;
+}
+
+.row-6 {
+    border: 8px solid transparent;
+    padding: 12px;
+    border-image: url(separador.jpg) 30 round;
+    border-bottom: solid;
+    border-right: solid;
+    border-left-style: solid;
+}
+.runway-class{
+    padding: 12px 15px;
+}

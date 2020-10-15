@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { Form } from 'react-bootstrap';
+import ReCAPTCHA from 'react-google-recaptcha';
 import './Auth.css';
 import AuthContext from '../context/auth-context';
 
@@ -17,6 +18,8 @@ class AuthPage extends Component {
     this.identificationEl = React.createRef();
     this.phoneEl = React.createRef();
     this.fullnameEl = React.createRef();
+
+    this.handleCaptchaResponseChange = this.handleCaptchaResponseChange.bind(this);
   }
 
   switchModeHandler = () => {
@@ -104,6 +107,13 @@ class AuthPage extends Component {
         console.log(err);
       });
   };
+  handleCaptchaResponseChange(response) {
+    //this.recaptcha.reset();
+    this.setState({
+      recaptchaResponse: response,
+    });
+    
+  }
 
   render() {
     return (
@@ -161,7 +171,11 @@ class AuthPage extends Component {
                 <Form.Control type="number" placeholder="Ingrese su # de teléfono"
                   id="phone" ref={this.phoneEl} />
               </Form.Group>
-
+              <ReCAPTCHA
+                ref={(el) => { this.recaptcha = el; }}
+                sitekey="6LcBCtcZAAAAABFgyRnSox89AdfkmxVbWWw19773"
+                onChange={this.handleCaptchaResponseChange}
+              />
 
 
             </React.Fragment>

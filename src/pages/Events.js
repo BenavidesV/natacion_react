@@ -17,7 +17,7 @@ import Dragula from 'react-dragula';
 
 var dragula = require('react-dragula');
 class EventsPage extends Component {
-  
+
   state = {
     reiterative: false,
     creating: false,
@@ -39,7 +39,7 @@ class EventsPage extends Component {
 
   componentDidMount() {
     this.fetchEvents();
-    
+
   }
   componentDidUpdate() {
     var drake = dragula(Array.from(document.getElementsByClassName('cont-dragula')),
@@ -248,7 +248,7 @@ class EventsPage extends Component {
       this.setState({ selectedEvent: null });
       return;
     }
-    console.log("En bookEventHandler: "+this.state.reiterative);
+    console.log("En bookEventHandler: " + this.state.reiterative);
     if (this.state.reiterative) {
 
       const requestBodyEvents = {
@@ -295,11 +295,11 @@ class EventsPage extends Component {
             event['start'] = moment(event.date);
             event['end'] = moment(event.date).add(1, 'hours');
             event['value'] = event.description;
-            console.log(moment(event.date) >= moment(this.state.selectedEvent.date)+
-            "day(): "+moment(event.date).day() === moment(this.state.selectedEvent.date).day()+
-            "month: "+moment(event.date).month() === moment(this.state.selectedEvent.date).month()+
-            "hour: "+moment(event.date).hour() === moment(this.state.selectedEvent.date).hour()+
-            "year: "+(moment(event.date).year() === moment(this.state.selectedEvent.date).year()));
+            console.log(moment(event.date) >= moment(this.state.selectedEvent.date) +
+              "day(): " + moment(event.date).day() === moment(this.state.selectedEvent.date).day() +
+              "month: " + moment(event.date).month() === moment(this.state.selectedEvent.date).month() +
+              "hour: " + moment(event.date).hour() === moment(this.state.selectedEvent.date).hour() +
+              "year: " + (moment(event.date).year() === moment(this.state.selectedEvent.date).year()));
             if (moment(event.date) >= moment(this.state.selectedEvent.date) &&
               (moment(event.date).day() === moment(this.state.selectedEvent.date).day()) &&
               (moment(event.date).month() === moment(this.state.selectedEvent.date).month()) &&
@@ -405,7 +405,7 @@ class EventsPage extends Component {
           if (res.status !== 200 && res.status !== 201) {
             alert("Usted ya estaba registrado");
             throw new Error('Failed!');
-            
+
           }
           return res.json();
         })
@@ -434,14 +434,14 @@ class EventsPage extends Component {
   };
 
   setRunway(currentUserId, runwaySelected) {
-    
+
     var currentBookings = [...this.state.bookings];
     const list = currentBookings.map((element, i) => {
 
       if (element.user._id === currentUserId) {
-        element.runway=runwaySelected;
-        element.attendance=true;
-        if (runwaySelected === 0) element.attendance=false;
+        element.runway = runwaySelected;
+        element.attendance = true;
+        if (runwaySelected === 0) element.attendance = false;
       }
     });
     /*if (this.isActive) {
@@ -454,8 +454,8 @@ class EventsPage extends Component {
       //this.setState({bookings: null});
       //this.setState({bookings: currentBookings});  
     }*/
-    
-    console.log("desde setRunway: "+JSON.stringify(this.state.bookings));
+
+    console.log("desde setRunway: " + JSON.stringify(this.state.bookings));
     //this.handleUpdate(this.state.bookings);
     //return currentBookings;
     //this.checkList();
@@ -561,13 +561,14 @@ class EventsPage extends Component {
         .catch(err => {
           console.log(err);
           this.setState({ isLoading: false });
-          
+
         });
-        return;
-    })};
+      return;
+    })
+  };
 
   handleUpdate = (updatedBookings) => {
-    this.setState({bookings: updatedBookings});
+    this.setState({ bookings: updatedBookings });
   }
 
   render() {
@@ -619,7 +620,9 @@ class EventsPage extends Component {
         )}
         {this.context.token && this.context.userRole === "a" && (
           <div className="events-control">
-            <p>Piscina</p>
+            <p><svg width="1em" height="1em" viewBox="0 0 16 16" className="bi bi-bookmark-fill" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+              <path fillRule="evenodd" d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.74.439L8 13.069l-5.26 2.87A.5.5 0 0 1 2 15.5V2z" />
+            </svg>   Administración</p>
             <button className="btn" onClick={this.startCreateEventHandler}>
               Crear evento
             </button>

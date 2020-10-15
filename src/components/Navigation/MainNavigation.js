@@ -10,7 +10,14 @@ const mainNavigation = props => (
       return (
         <header className="main-navigation">
           <div className="main-navigation__logo">
-            <h4 className="main-navigation__items">Asociación Deportiva de Natación Ciudad Quesada</h4>
+            <img
+              src="favicon.ico"
+              alt="Asociación Deportiva de Natación Ciudad Quesada"
+              width="57rem"
+              className="rounded-img"
+              title="Asociación Deportiva de Natación Ciudad Quesada">
+            </img>
+            <h4 className="main-navigation__items"></h4>
           </div>
           <nav className="main-navigation__items">
             <ul>
