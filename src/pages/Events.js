@@ -126,7 +126,7 @@ class EventsPage extends Component {
             capacity: capacity
           }
         };
-        fetch('http://localhost:8000/graphql', {
+        fetch('https://api-swimming.herokuapp.com/graphql', {
           method: 'POST',
           body: JSON.stringify(requestBody),
           headers: {
@@ -195,7 +195,7 @@ class EventsPage extends Component {
         `
     };
 
-    fetch('http://localhost:8000/graphql', {
+    fetch('https://api-swimming.herokuapp.com/graphql', {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {
@@ -276,7 +276,7 @@ class EventsPage extends Component {
           selectedEventDate: this.state.selectedEvent.date
         }
       };
-      fetch('http://localhost:8000/graphql', {
+      fetch('https://api-swimming.herokuapp.com/graphql', {
         method: 'POST',
         body: JSON.stringify(requestBodyEvents),
         headers: {
@@ -324,7 +324,7 @@ class EventsPage extends Component {
                 }
               };
 
-              fetch('http://localhost:8000/graphql', {
+              fetch('https://api-swimming.herokuapp.com/graphql', {
                 method: 'POST',
                 body: JSON.stringify(requestB),
                 headers: {
@@ -393,7 +393,7 @@ class EventsPage extends Component {
         }
       };
 
-      fetch('http://localhost:8000/graphql', {
+      fetch('https://api-swimming.herokuapp.com/graphql', {
         method: 'POST',
         body: JSON.stringify(requestBody),
         headers: {
@@ -488,7 +488,7 @@ class EventsPage extends Component {
     };
 
 
-    fetch('http://localhost:8000/graphql', {
+    fetch('https://api-swimming.herokuapp.com/graphql', {
       method: 'POST',
       body: JSON.stringify(requestBody),
       headers: {
@@ -538,7 +538,7 @@ class EventsPage extends Component {
         }
 
       };
-      fetch('http://localhost:8000/graphql', {
+      fetch('https://api-swimming.herokuapp.com/graphql', {
         method: 'POST',
         body: JSON.stringify(requestBody),
         headers: {
