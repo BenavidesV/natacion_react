@@ -94,6 +94,9 @@ class AuthPage extends Component {
         return res.json();
       })
       .then(resData => {
+        if (resData.data.createUser) {
+          this.setState({isLogin: false})
+        }
         if (resData.data.login.token) {
           this.context.login(
             resData.data.login.token,
