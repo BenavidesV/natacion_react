@@ -3,6 +3,7 @@ import { Form } from 'react-bootstrap';
 import ReCAPTCHA from 'react-google-recaptcha';
 import './Auth.css';
 import AuthContext from '../context/auth-context';
+import CookieConsent from "react-cookie-consent";
 
 class AuthPage extends Component {
   state = {
@@ -95,8 +96,8 @@ class AuthPage extends Component {
       })
       .then(resData => {
         if (resData.data.createUser) {
-          this.setState({isLogin: false})
-        }else{
+          this.setState({ isLogin: true })
+        } else {
           if (resData.data.login.token) {
             this.context.login(
               resData.data.login.token,
@@ -106,7 +107,7 @@ class AuthPage extends Component {
             );
           }
         }
-        
+
       })
       .catch(err => {
         console.log(err);
@@ -117,7 +118,7 @@ class AuthPage extends Component {
     this.setState({
       recaptchaResponse: response,
     });
-    
+
   }
 
   render() {
@@ -193,6 +194,16 @@ class AuthPage extends Component {
             {this.state.isLogin ? 'No tengo cuenta. Crear' : 'Tengo cuenta. Iniciar sesión'}
           </button>
         </div>
+        <CookieConsent
+          location="bottom"
+          buttonText="Entendido"
+          cookieName="myAwesomeCookieName2"
+          style={{ background: "#2B373B" }}
+          buttonStyle={{ color: "#4e503b", fontSize: "13px" }}
+          expires={150}
+        >
+          Este sitio usa cookies para optimizar su experiencia como usuario
+        </CookieConsent>
       </form>
     );
   }
