@@ -96,15 +96,17 @@ class AuthPage extends Component {
       .then(resData => {
         if (resData.data.createUser) {
           this.setState({isLogin: false})
+        }else{
+          if (resData.data.login.token) {
+            this.context.login(
+              resData.data.login.token,
+              resData.data.login.userId,
+              resData.data.login.userRole,
+              resData.data.login.tokenExpiration
+            );
+          }
         }
-        if (resData.data.login.token) {
-          this.context.login(
-            resData.data.login.token,
-            resData.data.login.userId,
-            resData.data.login.userRole,
-            resData.data.login.tokenExpiration
-          );
-        }
+        
       })
       .catch(err => {
         console.log(err);
