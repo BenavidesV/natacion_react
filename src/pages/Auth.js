@@ -191,7 +191,7 @@ class AuthPage extends Component {
         <div className="form-actions">
           <button type="submit">Enviar</button>
           <button type="button" onClick={this.switchModeHandler}>
-            {this.state.isLogin ? 'No tengo cuenta. Crear' : 'Tengo cuenta. Iniciar sesión'}
+            {this.state.isLogin ? 'Crear cuenta' : 'Tengo cuenta. Iniciar sesión'}
           </button>
         </div>
         <CookieConsent
