@@ -4,12 +4,21 @@ import ReCAPTCHA from 'react-google-recaptcha';
 import './Auth.css';
 import AuthContext from '../context/auth-context';
 import CookieConsent from "react-cookie-consent";
+import { Button, notification } from 'antd';
 
 class AuthPage extends Component {
   state = {
     isLogin: true
   };
 
+  openNotification = (message,type) => {
+    notification[type]({
+    message: '',
+    description:
+      message,
+  });
+
+};
   static contextType = AuthContext;
 
   constructor(props) {
@@ -36,6 +45,7 @@ class AuthPage extends Component {
 
 
     if (email.trim().length === 0 || password.trim().length === 0) {
+      this.openNotification("Hay campos requeridos sin completar",'warning');
       return;
     }
 
@@ -62,7 +72,7 @@ class AuthPage extends Component {
       const fullname = this.fullnameEl.current.value;
       requestBody = {
         query: `
-          mutation CreateUser($email: String!, $password: String!, $identification: String!, 
+          mutation CreateUser($email: String!, $password: String!, $identification: String!,
             $phone: String, $fullname: String!) {
             createUser(userInput: {email: $email, password: $password, role: "u",
               identification: $identification, phone: $phone, fullname: $fullname}) {
@@ -80,7 +90,6 @@ class AuthPage extends Component {
         }
       };
     }
-
     fetch('https://api-swimming.herokuapp.com/graphql', {
       method: 'POST',
       body: JSON.stringify(requestBody),
@@ -88,10 +97,7 @@ class AuthPage extends Component {
         'Content-Type': 'application/json'
       }
     })
-      .then(res => {
-        if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!');
-        }
+      .then(res=> {
         return res.json();
       })
       .then(resData => {
@@ -108,9 +114,21 @@ class AuthPage extends Component {
           }
         }
 
+        })
+      .then(errors => {
+        console.log("handle.res: "+errors.errors[0].message);
+        if (errors.errors[0].message=="Password is incorrect!") {
+          this.openNotification("Los datos suministrados no coinciden con nuestros registros",'error');
+        }
+        if (errors.errors[0].message=="User exists already.") {
+          this.openNotification("Ese usuario ya existe en nuestros registros",'warning');
+        }
+        if (!errors.ok) throw new Error(errors.error);
+         throw new Error(errors);
       })
+
       .catch(err => {
-        console.log(err);
+        console.log("desde el catch "+err);
       });
   };
   handleCaptchaResponseChange(response) {
@@ -120,6 +138,7 @@ class AuthPage extends Component {
     });
 
   }
+
 
   render() {
     return (
@@ -205,7 +224,7 @@ class AuthPage extends Component {
           Este sitio usa cookies para optimizar su experiencia como usuario
         </CookieConsent>
       </form>
-    );
+    )
   }
 }
 

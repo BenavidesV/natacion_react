@@ -14,6 +14,7 @@ import AdminEvent from '../components/Events/Admin/AdminEvent';
 import UserEvent from '../components/Events/User/UserEvent';
 import GuestEvent from '../components/Events/Guest/GuestEvent';
 import Dragula from 'react-dragula';
+import { notification } from 'antd';
 
 var dragula = require('react-dragula');
 class EventsPage extends Component {
@@ -36,6 +37,13 @@ class EventsPage extends Component {
 
   static contextType = AuthContext;
 
+  openNotification = (message,type) => {
+    notification[type]({
+    message: '',
+    description:
+      message,
+  })
+};
 
   componentDidMount() {
     this.fetchEvents();
@@ -109,7 +117,7 @@ class EventsPage extends Component {
         requestBody = {
           query: `
                 mutation CreateEvent($title: String!, $desc: String!, $date: String!, $capacity: Int!) {
-                  createEvent(eventInput: {title: $title, description: $desc, date: $date, 
+                  createEvent(eventInput: {title: $title, description: $desc, date: $date,
                     capacity: $capacity}) {
                     _id
                     title
@@ -403,7 +411,8 @@ class EventsPage extends Component {
       })
         .then(res => {
           if (res.status !== 200 && res.status !== 201) {
-            alert("Usted ya estaba registrado");
+            this.setState({ events: stateEvents, selectedEvent: null });
+            this.openNotification("Usted ya estaba registrado",'warning');
             throw new Error('Failed!');
 
           }
@@ -452,7 +461,7 @@ class EventsPage extends Component {
         },
       }));
       //this.setState({bookings: null});
-      //this.setState({bookings: currentBookings});  
+      //this.setState({bookings: currentBookings});
     }*/
 
     console.log("desde setRunway: " + JSON.stringify(this.state.bookings));
